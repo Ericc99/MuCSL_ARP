@@ -27,6 +27,24 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# 定义能Django互通的域名
+CORS_ALLOWED_ORIGINS = [
+    # Vue的域名
+    "http://localhost:5173",
+    # Django的域名
+    "http://127.0.0.1:8000"
+]
+
+# 配置Rest framework，后面再看是为什么这么写吧
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSED':{
+        'rest_framwork.authentication.TokenAuthentication'
+    },
+    'DEFAULT_PERMISSION_CLASSED':{
+        'rest_framwork.permission.IsAuthenticated'
+    }
+}
+
 
 # Application definition
 
@@ -37,11 +55,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # 引入需要用的各种东西
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'djoser'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    # 引入CorsMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -75,8 +101,12 @@ WSGI_APPLICATION = 'test_proj_django.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql', # 数据库类型
+        'NAME': 'django', # 数据库名称
+        'USER': 'root', # 用户名
+        'PASSWORD': '12345677', # 密码
+        'HOST': '127.0.0.1', # MySQL服务器主机地址
+        'POST': '3306', # 主机地址端口号
     }
 }
 

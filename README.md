@@ -8,7 +8,7 @@
 
 ## Learning Notes
 
-### [Ver 0] Initial commit with all dependencies installed
+### [Ver 0] Initial Commit
 
 To init a vue project
 
@@ -47,6 +47,28 @@ pip install django-rest-framework
 pip install django-cors-headers
 ```
 
+### [Ver 1] Project Config and Basic Views
+
+#### Django Modifications
+
+- Updated test_proj_django/settings.py to introduce the utilities and middlerware we need
+- Installed Mysql dependency as intructed [here](https://pypi.org/project/mysqlclient/)
+- Updated database relative settings in test_proj_django/settings.py to modify the database from sqlite to mysql
+- Performed migration with following commands
+
+```bash
+python3 manage.py makemigrations
+python3 manage.py migrate
+```
+
+
+#### Vue Modifications
+
+- Updated store/index.js file to establish user cookie system
+- Updated App.vue, established the basic page layout and imported necessary dependencies
+- Updated router/index.js file to update navigation and page info
+- Updated Home.vue and About.vue page
+
 ## Major References
 
 1. [Django and Vue3 Tutorial in Designing a Invoice App](https://www.youtube.com/watch?v=ktplOX4bz0M&t=1139s)
@@ -55,4 +77,5 @@ pip install django-cors-headers
 
 ## Commit History
 
-> 2023.11.09 [Ver 0] Initial commit with all dependencies installed
+> 2023.11.09 [Ver 0] Initial Commit
+> 2023.11.09 [Ver 1] Project Config and Basic Views
