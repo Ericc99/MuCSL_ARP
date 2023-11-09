@@ -6,7 +6,7 @@ import store from './store'
 
 // 导入axios框架，将Vue的路由挂载到Django的端口去以获取后端数据
 import axios from 'axios'
-axios.defaults.baseURL = 'https://127.0.0.1:8000'
+axios.defaults.baseURL = 'http://127.0.0.1:8000'
 
 const app = createApp(App)
 // 声明使用store

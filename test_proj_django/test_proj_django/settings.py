@@ -37,12 +37,12 @@ CORS_ALLOWED_ORIGINS = [
 
 # 配置Rest framework，后面再看是为什么这么写吧
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSED':{
-        'rest_framwork.authentication.TokenAuthentication'
-    },
-    'DEFAULT_PERMISSION_CLASSED':{
-        'rest_framwork.permission.IsAuthenticated'
-    }
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
 
 
@@ -66,8 +66,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     # 引入CorsMiddleware
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -135,7 +135,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# 时区设置为Hong Kong
+TIME_ZONE = 'Asia/Hong_Kong'
 
 USE_I18N = True
 

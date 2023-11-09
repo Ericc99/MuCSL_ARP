@@ -15,18 +15,23 @@
                     <!-- 调用Cookie内容检测是否已登陆 -->
                     <template v-if="$store.state.isAuthenticated">
                         <router-link to="/dashboard" class="navbar-item">Dashboard</router-link>
+                        <div class="navbar-item">
+                            <div class="buttons">
+                                <router-link to="/dashboard/my-account" class="button is-light">My account</router-link>
+                            </div>
+                        </div>
                     </template>
                     <template v-else>
                         <router-link to="/" class="navbar-item">Home</router-link>
-                    </template>
-                    <div class="navbar-item">
-                        <div class="buttons">
-                            <router-link to="/sign-up" class="button is-success">
-                                <strong>Sign up</strong>
-                            </router-link>
-                            <router-link to="/log-in" class="button is-light">Log in</router-link>
+                        <div class="navbar-item">
+                            <div class="buttons">
+                                <router-link to="/sign-up" class="button is-success">
+                                    <strong>Sign up</strong>
+                                </router-link>
+                                <router-link to="/log-in" class="button is-light">Log in</router-link>
+                            </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </div>
         </nav>
@@ -56,12 +61,13 @@ export default{
         this.$store.commit('initializeStore')
         const token = this.$store.state.token
         if(token){
-            axios.defaults.headers.common['Authorization'] = 'Token' + token
-            console.log('Token Detected: ' + token)
+            // 一个空格造成的惨案。。。
+            axios.defaults.headers.common['Authorization'] = 'Token ' + token
+            // console.log('Token Detected: ' + token)
         }
         else{
             axios.defaults.headers.common['Authorization'] = ''
-            console.log('Token Not Detected.')
+            // console.log('Token Not Detected.')
         }
     }
 }
