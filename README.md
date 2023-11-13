@@ -135,6 +135,12 @@ python3 manage.py migrate
 - Create registration email varification as can be referenced [here](https://stackoverflow.com/questions/32086740/how-you-create-confirmation-link-for-email)
 
 
+### [Ver 3.2] Logo Update and Removal of Minor Files
+
+#### Logo Update
+
+- MuSCL logo updated as icon and at front page.
+
 ## Major References
 
 1. [Django and Vue3 Tutorial in Designing a Invoice App](https://www.youtube.com/watch?v=ktplOX4bz0M&t=1139s)
@@ -155,3 +161,5 @@ python3 manage.py migrate
 > 2023.11.13 [Ver 3] Chemical Interface
 
 > 2023.11.13 [Ver 3.1] Bug Fix and Registration Update - TODO
+
+> 2023.11.13 [Ver 3.2] Logo Update and Removal of Minor Files

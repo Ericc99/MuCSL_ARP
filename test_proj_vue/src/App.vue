@@ -4,8 +4,15 @@
         <nav class="navbar is-dark">
             <!-- 导航栏左侧标题 -->
             <div class="navbar-brand">
+                <!-- <div class="field"></div> -->
+                <!-- <figure class="image is-48x48">
+                    <img src="../src/assets/SmartLab.ico">
+                </figure> -->
                 <router-link to="/" class="navbar-item">
-                    <strong>Smart Lab @ HKUST</strong>
+                    <figure>
+                        <img src="../src/assets/SmartLab.png">
+                    </figure>
+                    <strong style="white-space:pre"> Smart Lab @ HKUST</strong>
                 </router-link>
             </div>
             <!-- 导航栏正文内容 -->
