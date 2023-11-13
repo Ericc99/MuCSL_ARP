@@ -123,6 +123,18 @@ python3 manage.py migrate
 - Created relational database based on SQL
 - Created the chemical interface
 
+### [Ver 3.1] Bug Fix and Registration Update - TODO
+
+#### Bug Fix
+
+- Updated authorization within test_proj_django/settings.py to allow COR request with all headers, solved the login bug [Reference](https://stackoverflow.com/questions/45118468/request-header-field-is-not-allowed-by-access-control-allow-headers-in-preflig)
+- Updated views/dashboard/Myaccount.vue to acquire token from localstore to instance store so that logout can be successful all time
+
+#### Registration Update TODO
+
+- Create registration email varification as can be referenced [here](https://stackoverflow.com/questions/32086740/how-you-create-confirmation-link-for-email)
+
+
 ## Major References
 
 1. [Django and Vue3 Tutorial in Designing a Invoice App](https://www.youtube.com/watch?v=ktplOX4bz0M&t=1139s)
@@ -141,3 +153,5 @@ python3 manage.py migrate
 > 2023.11.09 [Ver 2] Registration & Login System
 
 > 2023.11.13 [Ver 3] Chemical Interface
+
+> 2023.11.13 [Ver 3.1] Bug Fix and Registration Update - TODO

@@ -35,6 +35,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000"
 ]
 
+CORS_ALLOW_HEADERS = ('*')
+
 # 配置Rest framework，后面再看是为什么这么写吧
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

@@ -10,6 +10,9 @@ import axios from 'axios'
 
 export default{
     name: 'MyAccount',
+    mounted(){
+        this.getToken()
+    },
     methods:{
         logout(){
             // console.log(axios.defaults.headers.common['Authorization'])
@@ -32,6 +35,9 @@ export default{
                         console.log(JSON.stringify(error))
                     }
                 })
+        },
+        getToken(e){
+            this.$store.token = localStorage.token
         }
     }
 }

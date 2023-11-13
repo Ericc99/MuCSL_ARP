@@ -6,11 +6,16 @@
                 <!-- @submit.prevent 意思是说在提交的时候不刷新页面，这样就可以实现JS动态刷新页面信息 -->
                 <!-- 其后等于号里面写的是在submit的时候调用的函数 -->
                 <form @submit.prevent="submitForm">
-                    <div class="field">
-                        <label>E-mail</label>
+                    <label>E-mail</label>
+                    <div class="field has-addons">
                         <div class="control">
-                            <input type="email" name="username" class="input" v-model="username">
+                            <input type="text" name="username" class="input" v-model="username">
                         </div>
+                        <p class="control">
+                            <a class="button is-static">
+                                @connect.ust.hk
+                            </a>
+                        </p>
                     </div>
                     <div class="field">
                         <label>Password</label>
