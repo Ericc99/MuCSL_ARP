@@ -1,8 +1,8 @@
-# tutorial_proj
+# test_proj
 
 ## General Information
 
-> tutorial_proj repository is designed for learning purpose targeting frontend-backend seperated web application
+> test_proj repository is designed for learning purpose targeting frontend-backend seperated web application
 
 > Great thanks to Stein for the video tutorial and code instructions
 
@@ -94,6 +94,34 @@ python3 manage.py migrate
 "detail": "Authentication credentials were not provided."
 ```
 
+### [Ver 3] Chemical Interface
+
+#### Database Design
+
+- A database structure was designed to facilitate the whole operation
+
+#### Django Modifications
+- Created database structure and updated smart_lab/models.py to initialize the tables
+- Updated smart_lab/admin.py file to register the created models and 
+- Created and updated smart_lab/serializers.py to serialize data in the pattern created within the model file
+- Updated view functions with in the smart_lab/views.py to redefine the axios api functions
+- Updated router urls linking to the axios api so that vue can access the backend
+- Updated test_proj_vue/urls.py to link the local urls in smart_lab app into the mainstream
+
+#### Vue Modifications
+- Modified views/dashboard/Dashboard.vue to add access port to our chemical database
+- Created a list of views to perform the operations regarding chemical including
+    - Chemicals.vue
+    - Chemical.vue
+    - AddChemical.vue
+    - EditChemical.vue
+    - DropChemical.vue
+- Updated routing within the router/index.js to link urls with views
+
+#### Accomplishments
+
+- Created relational database based on SQL
+- Created the chemical interface
 
 ## Major References
 
@@ -102,9 +130,14 @@ python3 manage.py migrate
 3. [About Git Rebase Multiple Commits into One](https://segmentfault.com/a/1190000007748862)
 4. [Django Rest Framework Doc EN](https://www.django-rest-framework.org/)
 5. [Django Rest Framework Doc CN](https://q1mi.github.io/Django-REST-framework-documentation/)
+6. [Bulma Documentations](https://bulma.io/documentation/)
 
 ## Commit History
 
 > 2023.11.09 [Ver 0] Initial Commit
+
 > 2023.11.09 [Ver 1] Project Config and Basic Views
+
 > 2023.11.09 [Ver 2] Registration & Login System
+
+> 2023.11.13 [Ver 3] Chemical Interface

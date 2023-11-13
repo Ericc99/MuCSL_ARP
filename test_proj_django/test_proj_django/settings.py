@@ -60,7 +60,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'djoser'
+    'djoser',
+
+    # 注册app
+    'smart_lab.apps.SmartLabConfig'
 ]
 
 MIDDLEWARE = [

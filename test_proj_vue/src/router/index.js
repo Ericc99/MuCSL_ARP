@@ -6,6 +6,11 @@ import Login from '../views/Login.vue'
 import SignUp from '../views/SignUp.vue'
 import Dashboard from '../views/dashboard/Dashboard.vue'
 import MyAccount from '../views/dashboard/MyAccount.vue'
+import Chemicals from '../views/dashboard/Chemicals.vue'
+import Chemical from '../views/dashboard/Chemical.vue'
+import AddChemical from '../views/dashboard/AddChemical.vue'
+import EditChemical from '../views/dashboard/EditChemical.vue'
+import DropChemical from '../views/dashboard/DropChemical.vue'
 
 import store from '../store'
 
@@ -55,7 +60,48 @@ const router = createRouter({
         meta:{
             requiredLogin: true
         }
+    },
+    {
+        path: '/dashboard/chemicals',
+        name: 'Chemicals',
+        component: Chemicals,
+        meta:{
+            requiredLogin: true
+        }
+    },
+    {
+        path: '/dashboard/chemicals/:chemical_id',
+        name: 'Chemical',
+        component: Chemical,
+        meta:{
+            requiredLogin: true
+        }
+    },
+    {
+        path: '/dashboard/chemicals/add',
+        name: 'AddChemical',
+        component: AddChemical,
+        meta:{
+            requiredLogin: true
+        }
+    },
+    {
+        path: '/dashboard/chemicals/:chemical_id/edit',
+        name: 'EditChemical',
+        component: EditChemical,
+        meta:{
+            requiredLogin: true
+        }
+    },
+    {
+        path: '/dashboard/chemicals/:chemical_id/drop',
+        name: 'DropChemical',
+        component: DropChemical,
+        meta:{
+            DropChemical: true
+        }
     }
+    
   ]
 })
 
