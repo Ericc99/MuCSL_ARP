@@ -47,7 +47,13 @@ void message_compare(char *msg)
         char tmp[5];
         strcpy(tmp, msg + 4);
         int new_duty = atoi(tmp);
-        pwm_set_duty(new_duty);
+        motor_speed = new_duty;
+        // pwm_set_duty(new_duty);
+        if(PID_bool == false)
+        {
+            xTaskCreate(PID_controller, "PID_CONTROLLER_TASK", 4096, NULL, 1, NULL);
+            PID_bool = true;
+        }
     }
 }
 

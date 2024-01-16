@@ -8,6 +8,9 @@ esp_http_client_event_handle_t http_client = NULL;
 esp_mqtt_client_handle_t mqtt_client = NULL;
 bool temp_bool = false;
 int16_t pcnt_count = 0;
+bool pcnt_updated = false;
+double motor_speed = 0;
+bool PID_bool = false;
 
 void app_main(void){
     wifi_init();

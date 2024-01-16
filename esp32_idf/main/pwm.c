@@ -19,7 +19,7 @@ void pwm_init()
         .timer_sel  = LEDC_TIMER,
         .intr_type  = LEDC_INTR_DISABLE,
         .gpio_num   = LEDC_GPIO,
-        .duty       = 4096,
+        .duty       = 8192,
         .hpoint     = 0
     };
     ledc_channel_config(&ledc_channel);
@@ -31,4 +31,7 @@ void pwm_set_duty(int data)
     ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, data);
     ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
     ESP_LOGI(TAG, "Duty has been set to %d.", data);
+    // char buff[64];
+    // sprintf(buff, "Duty has been set to %d.", data);
+    // esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
 }

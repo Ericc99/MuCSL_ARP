@@ -45,8 +45,11 @@ extern int next_task_id_stamp;
 extern esp_http_client_event_handle_t http_client;
 extern esp_mqtt_client_handle_t mqtt_client;
 extern int16_t pcnt_count;
+extern bool pcnt_updated;
+extern double motor_speed;
 
 extern bool temp_bool;
+extern bool PID_bool;
 
 // WIFI 连接方法
 void wifi_init(void);
@@ -86,11 +89,12 @@ struct PID_params{
     double Ki;
     // Kd - 微分参数
     double Kd;
-    // dt - 采样间隔
-    double dt;
-    // max, min - 控制参数上、下限
-    double max;
-    double min;
+    // max, min - 控制参数上、下限(PWM)
+    double max_pwm;
+    double min_pwm;
+    // max, min - 实际转速上下限(PCNT)
+    double max_pcnt;
+    double min_pcnt;
 };
 
 // PID 数据
@@ -99,4 +103,10 @@ struct PID_data{
     double integral;
     // 历史误差
     double pre_error;
+    // 上次输入
+    double pre_input;
 };
+
+// PID 方法
+double PID_Calculate(struct PID_params params, struct PID_data *data, double target_speed, double current_speed);
+void PID_controller();

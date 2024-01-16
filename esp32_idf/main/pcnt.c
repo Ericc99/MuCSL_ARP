@@ -19,19 +19,16 @@ void pcnt_func_init()
 
 void pcnt_monitor()
 {
-    int count = 0;
     while(1)
     {
-        // 每一百毫秒进行一次计数，并且清除之前的计数
+        // 每一秒进行一次计数，并且清除之前的计数
         pcnt_get_counter_value(PCNT_UNIT, &pcnt_count);
         pcnt_counter_clear(PCNT_UNIT);
-        if(count == 9)
-        {
-            ESP_LOGI(TAG, "PCNT countis: %d", pcnt_count);
-            count = 0;
-        }
-        count ++;
-        ESP_LOGI(TAG, "PCNT countis: %d", pcnt_count);
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        ESP_LOGI(TAG, "PCNT count: %d", pcnt_count);
+        char buff[64];
+        sprintf(buff, "PCNT count: %d", pcnt_count);
+        esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
+        pcnt_updated = true;
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
