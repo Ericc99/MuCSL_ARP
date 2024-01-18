@@ -136,9 +136,6 @@ def spinning(request):
 def test(request):
     records = []
     for record in Spinning.objects.all().values():
-        # temp_datetime = parse_datetime(record['scheduled_time'])
-        # print(temp_datetime)
-        # print(temp_datetime.time_stamp())
         temp = {
             'id': record['id'],
             'time': timezone.localtime(record['scheduled_time']).timestamp(),

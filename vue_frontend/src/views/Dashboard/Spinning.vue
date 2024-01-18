@@ -246,6 +246,11 @@ export default{
                 .post('/api/mqtt_msg/', data)
                 .then(response => {
                     console.log(response)
+                    if(this.target_speed == 0){
+                        clearInterval(this.listener)
+                        this.listen_started = false
+                        this.real_speed = 0
+                    }
                 })
                 .catch(error =>{
                     if(error.response){

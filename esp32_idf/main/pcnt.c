@@ -25,7 +25,7 @@ void pcnt_monitor()
         // 每一秒进行一次计数，并且清除之前的计数
         pcnt_get_counter_value(PCNT_UNIT, &pcnt_count);
         pcnt_counter_clear(PCNT_UNIT);
-        ESP_LOGI(TAG, "PCNT count: %d", pcnt_count);
+        // ESP_LOGI(TAG, "PCNT count: %d", pcnt_count);
         if(motor_speed == 0 && idle == false)
         {
             char buff[64];

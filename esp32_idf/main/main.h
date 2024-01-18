@@ -42,13 +42,14 @@ extern int partition_data_len;
 extern double global_time_stamp;
 extern double next_task_time_stamp;
 extern int next_task_id_stamp;
+extern double next_task_duration;
+extern bool next_task_done;
 extern esp_http_client_event_handle_t http_client;
 extern esp_mqtt_client_handle_t mqtt_client;
 extern int16_t pcnt_count;
 extern bool pcnt_updated;
 extern double motor_speed;
 
-extern bool temp_bool;
 extern bool PID_bool;
 
 // WIFI 连接方法
@@ -56,6 +57,7 @@ void wifi_init(void);
 
 // MQTT 连接方法
 void mqtt_init(void *pvParameters);
+void read_data();
 
 // HTTP 连接方法
 esp_http_client_event_handle_t http_init(void);
@@ -72,6 +74,7 @@ char* partition_read();
 
 // Timer 线程
 void timer_instance();
+void event_monitor();
 
 // PWM 方法
 void pwm_init();
