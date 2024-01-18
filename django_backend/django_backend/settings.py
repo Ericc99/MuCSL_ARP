@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +75,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_backend.wsgi.application'
+# ASGI 设置（Websocket路由方式）
+# ASGI_APPLICATION = "django_backend.asgi.application"
 
 
 # Database
@@ -134,3 +137,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# MQTT 相关设置
+MQTT_SERVER = '192.168.31.18'
+MQTT_PORT = 1883
+MQTT_KEEPALIVE = 60
+MQTT_USER = 'Django'
+MQTT_PASSWORD = '123456'

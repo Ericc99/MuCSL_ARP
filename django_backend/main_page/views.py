@@ -11,6 +11,9 @@ from django.utils import timezone
 
 from .token import create_token, check_token, token_auth
 
+from .mqtt import client as mqtt_client
+
+
 @api_view(['GET', 'POST'])
 def task_list(request):
     if request.method == 'GET':
@@ -144,6 +147,24 @@ def test(request):
         }
         records.append(temp)
     return Response({'now': timezone.localtime().timestamp(),'data': records}, status=status.HTTP_200_OK)
+
+# MQTT View
+@api_view(['GET', 'POST'])
+def mqtt_msg(request):
+    if request.method == 'POST':
+        if(request.data['topic']):
+            topic = request.data['topic']
+            msg = request.data['msg'] * 6
+            msg = 'pwm_' + str(msg)
+            # return Response(status=status.HTTP_200_OK)
+            rc, mid = mqtt_client.publish(topic, msg)
+            return JsonResponse({'code': rc})
+        else:
+            return Response({'request fail': 'Deined'}, status=status.HTTP_403_FORBIDDEN)
+    if request.method == 'GET':
+        motor_speed = MotorControl.objects.values().last()['motor_speed']
+        return Response({'speed': motor_speed}, status=status.HTTP_200_OK)
+
 
 
 

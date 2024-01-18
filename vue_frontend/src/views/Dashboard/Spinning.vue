@@ -1,103 +1,125 @@
 <template>
     <h1 class="title">Spinning Control</h1>
-    <div class="columns">
-        <div class="column is-5">
+    <div class="column is-9">
+        <div class="field">
+            <p class="title is-4">
+                Motor List
+            </p>
             <div class="field">
-                <p class="title is-4">
-                    Motor List
-                </p>
-                <div class="field">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Avaliability</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody v-for="motor in this.motors">
-                            <tr>
-                                <th>{{ motor['id'] }}</th>
-                                <td>{{ motor['name'] }}</td>
-                                <td>{{ motor['avaliable'] }}</td>
-                                <td>{{ motor['description'] }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="column is-5">
-            <div class="field">
-                <p class="title is-4">
-                    Registration
-                </p>
-                <div class="field">
-                    <label>
-                        Motor Selection
-                    </label>
-                    <div class="control">
-                        <div class="select">
-                            <select v-model="this.motor_selected">
-                                <option v-for="motor in this.motors">
-                                    {{ motor['name'] }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>
-                        Scheduled Time
-                    </label>
-                    <VueDatePicker v-model="date"/>
-                </div>
-                <div class="field">
-                    <label>
-                        Spinning Speed
-                    </label>
-                    <input type="number" class="input" v-model="this.speed">
-                </div>
-                <div class="field">
-                    <label>
-                        Spinning Time(s)
-                    </label>
-                    <input type="number" class="input" v-model="this.duration">
-                </div>
-                <div class="notification is-danger" v-if="this.errors.length">
-                    <p v-for="error in this.errors" v-bind:key="error">
-                        {{ error }}
-                    </p>
-                </div>
-                <div class="buttons">
-                    <button class="button is-success" @click="this.submit">Submit</button>
-                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Avaliability</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody v-for="motor in this.motors">
+                        <tr>
+                            <th>{{ motor['id'] }}</th>
+                            <td>{{ motor['name'] }}</td>
+                            <td>{{ motor['avaliable'] }}</td>
+                            <td>{{ motor['description'] }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    <div class="columns">
-        <div class="column is-5">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Motor_Name</th>
-                        <th>Scheduled Time</th>
-                        <th>Spinning Speed</th>
-                        <th>Spinning Time</th>
-                    </tr>
-                </thead>
-                <tbody v-for="record in this.records">
-                    <tr>
-                        <th>{{ record['id'] }}</th>
-                        <td>{{ record['motor_name'] }}</td>
-                        <td>{{ record['scheduled_time'] }}</td>
-                        <td>{{ record['motor_speed'] }}</td>
-                        <td>{{ record['duration_sec'] }}</td>
-                    </tr>
-                </tbody>
-            </table>
+    
+    <div class="column is-9">
+        <p class="title is-4">
+            Registration List
+        </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Motor_Name</th>
+                    <th>Scheduled Time</th>
+                    <th>Spinning Speed</th>
+                    <th>Spinning Time</th>
+                </tr>
+            </thead>
+            <tbody v-for="record in this.records">
+                <tr>
+                    <th>{{ record['id'] }}</th>
+                    <td>{{ record['motor_name'] }}</td>
+                    <td>{{ record['scheduled_time'] }}</td>
+                    <td>{{ record['motor_speed'] }}</td>
+                    <td>{{ record['duration_sec'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="column is-5">
+        <div class="field">
+            <p class="title is-4">
+                Registration
+            </p>
+            <div class="field">
+                <label>
+                    Motor Selection
+                </label>
+                <div class="control">
+                    <div class="select">
+                        <select v-model="this.motor_selected">
+                            <option v-for="motor in this.motors">
+                                {{ motor['name'] }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>
+                    Scheduled Time
+                </label>
+                <VueDatePicker v-model="date"/>
+            </div>
+            <div class="field">
+                <label>
+                    Spinning Speed
+                </label>
+                <input type="number" class="input" v-model="this.speed">
+            </div>
+            <div class="field">
+                <label>
+                    Spinning Time(s)
+                </label>
+                <input type="number" class="input" v-model="this.duration">
+            </div>
+            <div class="notification is-danger" v-if="this.errors.length">
+                <p v-for="error in this.errors" v-bind:key="error">
+                    {{ error }}
+                </p>
+            </div>
+            <div class="buttons">
+                <button class="button is-success" @click="this.submit">Submit</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="column is-5">
+        <div class="field">
+            <p class="title is-4">
+                Direct Control
+            </p>
+            <div class="field">
+                <label>Motor Speed (Real Time)</label>
+                <div class="field">
+                    <p>{{ this.real_speed }}</p>
+                </div>
+                <label>Target Speed (0-70 rps)</label>
+                <div class="field">
+                    <input type="number" class="input" v-model="this.target_speed">
+                </div>
+                <div class="buttons">
+                    <button class="button is-success" @click="this.set_speed">Submit</button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -113,11 +135,14 @@ export default{
         this.getMotors()
         this.getRecords()
     },
+    beforeRouteLeave(){
+        clearInterval(this.listener)
+    },
     setup() {
         const date = ref();
 
         return {
-        date
+            date
         }
     },
     data(){
@@ -128,6 +153,10 @@ export default{
             duration: 0,
             records: [],
             errors: [],
+            real_speed: 0,
+            target_speed: 0,
+            listen_started: false,
+            listener: null
         }
     },
     methods:{
@@ -207,6 +236,50 @@ export default{
                 data.minutes  + ':' + 
                 data.seconds
             return result
+        },
+        set_speed(){
+            const data = {
+                topic: 'control',
+                msg: this.target_speed
+            }
+            axios
+                .post('/api/mqtt_msg/', data)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error =>{
+                    if(error.response){
+                        for(const property in error.response.data){
+                            this.errors.push(`${property}: ${error.response.data[property]}`)
+                        }
+                    }
+                    else if(error.message){
+                        this.errors.push(`Error:${error.message}`)
+                    }
+                    else{
+                        console.log(JSON.stringify(error))
+                    }
+                })
+            this.get_speed()
+        },
+        get_speed(){
+            if(this.listen_started == false){
+                this.listener = setInterval(() => {
+                    axios
+                        .get('/api/mqtt_msg/')
+                        .then(response => {
+                            // this.real_speed = response.data['speed']
+                            // console.log(this.real_speed)
+                            // console.log(response)
+                            // console.log(response.data['speed'])
+                            this.real_speed = response.data['speed']
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }, 1000)
+                this.listen_started = true
+            }
         }
     },
     components: { VueDatePicker }

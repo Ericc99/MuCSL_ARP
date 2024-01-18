@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -11,6 +12,7 @@ class MotorControl(models.Model):
     id = models.AutoField(primary_key=True, null=False)
     motor_name = models.CharField(max_length=128, null=False)
     motor_speed = models.IntegerField(null=False)
+    time = models.DateTimeField(auto_now_add=True, null=False)
 
 class User(models.Model):
     id = models.AutoField(primary_key=True, null=False)

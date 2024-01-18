@@ -19,15 +19,27 @@ void pcnt_func_init()
 
 void pcnt_monitor()
 {
+    bool idle = false;
     while(1)
     {
         // 每一秒进行一次计数，并且清除之前的计数
         pcnt_get_counter_value(PCNT_UNIT, &pcnt_count);
         pcnt_counter_clear(PCNT_UNIT);
         ESP_LOGI(TAG, "PCNT count: %d", pcnt_count);
-        char buff[64];
-        sprintf(buff, "PCNT count: %d", pcnt_count);
-        esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
+        if(motor_speed == 0 && idle == false)
+        {
+            char buff[64];
+            sprintf(buff, "PCNT count: %d", pcnt_count);
+            esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
+            idle = true;
+        }
+        else if(motor_speed != 0)
+        {
+            char buff[64];
+            sprintf(buff, "PCNT count: %d", pcnt_count);
+            esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
+            idle = false;
+        }
         pcnt_updated = true;
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }

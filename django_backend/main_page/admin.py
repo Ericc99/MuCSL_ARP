@@ -8,7 +8,7 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ('task_name', 'task_description')
 
 class MotorControlAdmin(admin.ModelAdmin):
-    list_display = ('motor_name', 'motor_speed')
+    list_display = ('motor_name', 'motor_speed', 'time')
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'register_time')
 
