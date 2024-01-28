@@ -41,4 +41,9 @@ class Spinning(models.Model):
     motor_speed = models.IntegerField(null=False)
     duration_sec = models.IntegerField(null=False)
 
+# class UpdateRecord(models.Model):
+#     id = models.AutoField(primary_key=True, null=False)
+#     time = models.DateTimeField(auto_now_add=True, null=False)
+#     valid = models.BooleanField(default=False)
+
 

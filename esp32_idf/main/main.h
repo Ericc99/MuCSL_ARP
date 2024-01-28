@@ -38,8 +38,21 @@
 #define PCNT_POS_MODE       PCNT_COUNT_INC
 #define PCNT_NEG_MODE       PCNT_COUNT_DIS
 
+// 存储partition中数据的长度
 extern int partition_data_len;
-extern double global_time_stamp;
+
+// 全局时钟
+extern double global_clk;
+
+// 任务列表（时间戳），初始化为空，长度为32
+extern double task_list_time[32];
+
+// 任务参数列表，设置速度
+extern int task_list_speed[32];
+
+// 任务参数列表，任务ID
+extern int task_list_id[32];
+
 extern double next_task_time_stamp;
 extern int next_task_id_stamp;
 extern double next_task_duration;
@@ -70,11 +83,16 @@ void http_clean_up(esp_http_client_event_handle_t httpclient);
 
 // NVS 操作方法
 void partition_write(char data[]);
-char* partition_read();
+char* partition_read(); 
 
 // Timer 线程
 void timer_instance();
-void event_monitor();
+void timer_add(double time_stamp, int speed, double duration, int id);
+void timer_remove();
+void timer_check();
+void timer_clean();
+void timer_print();
+
 
 // PWM 方法
 void pwm_init();

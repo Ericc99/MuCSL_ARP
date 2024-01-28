@@ -100,12 +100,12 @@ void http_get(esp_http_client_event_handle_t httpclient)
         // 写入数据及获取数据长度
         partition_data_len = strlen(response_data);
         partition_write(response_data);
-        if(global_time_stamp == 0)
+        if(global_clk == 0)
         {
             // 第一次获取时间信息
             cJSON *root = cJSON_Parse(response_data);
             cJSON *time = cJSON_GetObjectItemCaseSensitive(root, "now");
-            global_time_stamp = time->valuedouble;
+            global_clk = time->valuedouble;
             xTaskCreate(timer_instance, "TIMER_TASK", 4096, NULL, 1, NULL);
             // 删除节点，释放内存
             cJSON_Delete(root);

@@ -1,7 +1,7 @@
 #include "main.h"
 
 int partition_data_len = 0;
-double global_time_stamp = 0.0;
+double global_clk = 0.0;
 double next_task_time_stamp = 0.0;
 int next_task_id_stamp = 0;
 double next_task_duration = 0;
@@ -12,6 +12,9 @@ int16_t pcnt_count = 0;
 bool pcnt_updated = false;
 double motor_speed = 0;
 bool PID_bool = false;
+double task_list_time[32] = {0.0};
+int task_list_speed[32] = {0};
+int task_list_id[32] = {0};
 
 void app_main(void){
     wifi_init();
@@ -21,4 +24,5 @@ void app_main(void){
     pwm_init();
     pcnt_func_init();
     xTaskCreate(pcnt_monitor, "PCNT_TASK", 4096, NULL, 1, NULL);
+    xTaskCreate(PID_controller, "PID_CONTROLLER_TASK", 4096, NULL, 1, NULL);
 }

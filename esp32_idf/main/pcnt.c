@@ -32,6 +32,7 @@ void pcnt_monitor()
             sprintf(buff, "PCNT count: %d", pcnt_count);
             esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
             idle = true;
+            pcnt_updated = false;
         }
         else if(motor_speed != 0)
         {
@@ -39,8 +40,8 @@ void pcnt_monitor()
             sprintf(buff, "PCNT count: %d", pcnt_count);
             esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
             idle = false;
+            pcnt_updated = true;
         }
-        pcnt_updated = true;
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

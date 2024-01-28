@@ -12,37 +12,6 @@ void message_compare(char *msg)
     }
     else if(!strcmp("read_data", msg))
     {
-        // // 获取NVS当中存储的JSON格式内容
-        // char* read_data = partition_read();
-        // // printf("Data len: %d\n", partition_data_len);
-        // // printf("Read Data: %s\n", read_data);
-        // // printf("Data Len: %d\n", strlen(read_data));
-
-        // // 创建临时变量存起来，并且去掉末尾的特殊符号，添加结尾符号
-        // char tmp[partition_data_len+1];
-        // strncpy(tmp, read_data, partition_data_len);
-        // tmp[partition_data_len] = '\0';
-        // printf("Result: %s\n", tmp);
-
-        // // 释放内存
-        // free(read_data);
-
-        // // JSON格式读取
-        // cJSON *root = cJSON_Parse(tmp);
-        // cJSON *data = cJSON_GetObjectItemCaseSensitive(root, "data");
-        // // 读取存储大小
-        // int task_size = cJSON_GetArraySize(data);
-        // printf("Total %d tasks in stock.\n", task_size);
-        // // 读取第一个数据时间并且存储
-        // cJSON* next_task = cJSON_GetArrayItem(data, 0);
-        // cJSON* next_task_id = cJSON_GetObjectItem(next_task, "id");
-        // cJSON* next_task_time = cJSON_GetObjectItem(next_task, "time");
-        // cJSON* next_task_dur = cJSON_GetObjectItem(next_task, "duration");
-        // next_task_time_stamp = next_task_time->valuedouble;
-        // next_task_id_stamp = next_task_id->valueint;
-        // next_task_duration = next_task_dur->valueint;
-        // // 删除节点，释放内存
-        // cJSON_Delete(root);
         read_data();
     }
     else if(strncmp(msg, "pwm_", 4) == 0)
@@ -52,11 +21,15 @@ void message_compare(char *msg)
         int new_duty = atoi(tmp);
         motor_speed = new_duty;
         // pwm_set_duty(new_duty);
-        if(PID_bool == false)
-        {
-            xTaskCreate(PID_controller, "PID_CONTROLLER_TASK", 4096, NULL, 1, NULL);
-            PID_bool = true;
-        }
+        // if(PID_bool == false)
+        // {
+        //     xTaskCreate(PID_controller, "PID_CONTROLLER_TASK", 4096, NULL, 1, NULL);
+        //     PID_bool = true;
+        // }
+    }
+    else if(!strcmp("print_list", msg))
+    {
+        timer_print();
     }
 }
 
@@ -80,19 +53,40 @@ void read_data()
     
     // 读取存储大小
     int task_size = cJSON_GetArraySize(data);
-    printf("Total %d tasks in stock.\n", task_size);
+    // printf("Total %d tasks in stock.\n", task_size);
     
-    // 读取第一个数据时间并且存储
-    cJSON* next_task = cJSON_GetArrayItem(data, 0);
-    cJSON* next_task_id = cJSON_GetObjectItem(next_task, "id");
-    cJSON* next_task_time = cJSON_GetObjectItem(next_task, "time");
-    cJSON* next_task_dur = cJSON_GetObjectItem(next_task, "duration");
-    next_task_time_stamp = next_task_time->valuedouble;
-    next_task_id_stamp = next_task_id->valueint;
-    next_task_duration = next_task_dur->valueint;
+    // 判断是否超过16个，如果超过，那么就直接截取掉后面的不用
+    if(task_size > 16){
+        task_size = 16;
+    }
+    
+    // 清除Timer中现有数据
+    timer_clean();
+
+    // 将所有的task全部添加作timer事件
+    for(int i = 0; i < task_size; i++){
+        cJSON * tmp_task = cJSON_GetArrayItem(data, i);
+        cJSON* tmp_task_id = cJSON_GetObjectItem(tmp_task, "id");
+        cJSON* tmp_task_time = cJSON_GetObjectItem(tmp_task, "time");
+        cJSON* tmp_task_duration = cJSON_GetObjectItem(tmp_task, "duration");
+        cJSON* tmp_task_speed = cJSON_GetObjectItem(tmp_task, "speed");
+        timer_add(tmp_task_time->valuedouble, tmp_task_speed->valueint, tmp_task_duration->valuedouble, tmp_task_id->valueint);
+    }
+
+    // // 读取第一个数据时间并且存储
+    // cJSON* next_task = cJSON_GetArrayItem(data, 0);
+    // cJSON* next_task_id = cJSON_GetObjectItem(next_task, "id");
+    // cJSON* next_task_time = cJSON_GetObjectItem(next_task, "time");
+    // cJSON* next_task_dur = cJSON_GetObjectItem(next_task, "duration");
+    // next_task_time_stamp = next_task_time->valuedouble;
+    // next_task_id_stamp = next_task_id->valueint;
+    // next_task_duration = next_task_dur->valueint;
     
     // 删除节点，释放内存
     cJSON_Delete(root);
+
+    // 打印当前所有事件
+    timer_print();
 }
 
 // mqtt的状态机事件处理函数

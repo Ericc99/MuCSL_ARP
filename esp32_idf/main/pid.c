@@ -91,6 +91,9 @@ void PID_controller()
             pwm_set_duty(new_input_int);
             pcnt_updated = false;
         }
+        else{
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+        }
     }
 }
 
