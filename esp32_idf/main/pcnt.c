@@ -30,15 +30,18 @@ void pcnt_monitor()
         {
             char buff[64];
             sprintf(buff, "PCNT count: %d", pcnt_count);
-            esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
-            idle = true;
+            esp_mqtt_client_publish(mqtt_client, "pcnt_feedback", buff, strlen(buff), 2, 0);
+            pwm_set_duty(8192);
             pcnt_updated = false;
+            if(pcnt_count == 0){
+                idle = true;
+            }
         }
         else if(motor_speed != 0)
         {
             char buff[64];
-            sprintf(buff, "PCNT count: %d", pcnt_count);
-            esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
+            sprintf(buff, "PCNT count 2: %d", pcnt_count);
+            esp_mqtt_client_publish(mqtt_client, "pcnt_feedback", buff, strlen(buff), 2, 0);
             idle = false;
             pcnt_updated = true;
         }

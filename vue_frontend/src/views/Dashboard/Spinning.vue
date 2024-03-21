@@ -3,6 +3,34 @@
     <div class="column is-9">
         <div class="field">
             <p class="title is-4">
+                Motor Status
+            </p>
+            <div class="field">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Avaliability</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody v-for="motor in this.motors">
+                        <tr>
+                            <th>{{ motor['id'] }}</th>
+                            <td>{{ motor['name'] }}</td>
+                            <td>{{ motor['avaliable'] }}</td>
+                            <td>{{ motor['description'] }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <p>Hello \u{1F600}</p>
+    <div class="column is-9">
+        <div class="field">
+            <p class="title is-4">
                 Motor List
             </p>
             <div class="field">
@@ -105,10 +133,10 @@
     <div class="column is-5">
         <div class="field">
             <p class="title is-4">
-                Direct Control
+                Operating Information
             </p>
             <div class="field">
-                <label>Motor Speed (Real Time)</label>
+                <label>Motor 1 Speed (rps)</label>
                 <div class="field">
                     <p>{{ this.real_speed }}</p>
                 </div>

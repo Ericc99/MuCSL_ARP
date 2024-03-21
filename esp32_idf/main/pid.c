@@ -53,7 +53,7 @@ double PID_Calculate(struct PID_params params, struct PID_data *data, double tar
 }
 
 // 初始化PID控制器
-void PID_controller()
+void PID_init()
 {
     struct PID_data data = {
         .integral   = 0,
@@ -74,19 +74,8 @@ void PID_controller()
     while(1){
         if(pcnt_updated == true)
         {
-            if(motor_speed == 0)
-            {
-                data.integral = 0;
-                data.pre_error = 0;
-                data.pre_input = 0;
-                pwm_set_duty(8192);
-                pcnt_updated = false;
-            }
             double temp = motor_speed;
             double new_input = PID_Calculate(params, &data, temp, pcnt_count);
-            // char buff[64];
-            // sprintf(buff, "Calculated input is: %f", new_input);
-            // esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
             int new_input_int = 8192 - (int)new_input;
             pwm_set_duty(new_input_int);
             pcnt_updated = false;
@@ -96,5 +85,21 @@ void PID_controller()
         }
     }
 }
+
+// 创建一个控制任务
+void control_cmd(void *params)
+{
+    cmd_params* local_params = (cmd_params*)params;
+    char buff[64];
+    sprintf(buff, "Initial Speed: %d\nDuration: %d\nEnding Speed: %d\n", local_params->start_speed, local_params->duration, local_params->end_speed);
+    esp_mqtt_client_publish(mqtt_client, "cmd", buff, strlen(buff), 2, 0);
+    motor_speed = local_params -> start_speed;
+    vTaskDelay(local_params -> duration * 1000 / portTICK_PERIOD_MS);
+    motor_speed = local_params -> end_speed;
+    sprintf(buff, "Task Finished.");
+    esp_mqtt_client_publish(mqtt_client, "task_manager", buff, strlen(buff), 2, 0);
+    vTaskDelete(NULL);
+}
+
 
 

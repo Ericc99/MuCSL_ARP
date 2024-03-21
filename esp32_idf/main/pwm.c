@@ -31,7 +31,7 @@ void pwm_set_duty(int data)
     ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, data);
     ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
     ESP_LOGI(TAG, "Duty has been set to %d.", data);
-    // char buff[64];
-    // sprintf(buff, "Duty has been set to %d.", data);
-    // esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
+    char buff[64];
+    sprintf(buff, "PID set to %d.", data);
+    esp_mqtt_client_publish(mqtt_client, "pid_feedback", buff, strlen(buff), 2, 0);
 }

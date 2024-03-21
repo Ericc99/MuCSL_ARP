@@ -38,61 +38,31 @@
 #define PCNT_POS_MODE       PCNT_COUNT_INC
 #define PCNT_NEG_MODE       PCNT_COUNT_DIS
 
-// 存储partition中数据的长度
-extern int partition_data_len;
-
-// 全局时钟
-extern double global_clk;
-
-// 任务列表（时间戳），初始化为空，长度为32
-extern double task_list_time[32];
-
-// 任务参数列表，设置速度
-extern int task_list_speed[32];
-
-// 任务参数列表，任务ID
-extern int task_list_id[32];
-
-extern double next_task_time_stamp;
-extern int next_task_id_stamp;
-extern double next_task_duration;
-extern bool next_task_done;
-extern esp_http_client_event_handle_t http_client;
+// MQTT Client 全局调用
 extern esp_mqtt_client_handle_t mqtt_client;
+
+// MQTT 传递motor参数用struct
+typedef struct
+{
+    int start_speed;
+    int duration;
+    int end_speed;
+} cmd_params;
+
+// PCNT 计数参数 在PCNT和PID之间传递信息
 extern int16_t pcnt_count;
+// PCNT 更新参数 保证PCNT测量和PID控制同步
 extern bool pcnt_updated;
+// Motor 预设转速全局参数
 extern double motor_speed;
 
-extern bool PID_bool;
 
 // WIFI 连接方法
 void wifi_init(void);
 
 // MQTT 连接方法
-void mqtt_init(void *pvParameters);
-void read_data();
-
-// HTTP 连接方法
-esp_http_client_event_handle_t http_init(void);
-
-// HTTP Get 方法
-void http_get(esp_http_client_event_handle_t httpclient);
-
-// HTTP Clean Up 方法
-void http_clean_up(esp_http_client_event_handle_t httpclient);
-
-// NVS 操作方法
-void partition_write(char data[]);
-char* partition_read(); 
-
-// Timer 线程
-void timer_instance();
-void timer_add(double time_stamp, int speed, double duration, int id);
-void timer_remove();
-void timer_check();
-void timer_clean();
-void timer_print();
-
+void mqtt_init();
+// void read_data();
 
 // PWM 方法
 void pwm_init();
@@ -130,4 +100,7 @@ struct PID_data{
 
 // PID 方法
 double PID_Calculate(struct PID_params params, struct PID_data *data, double target_speed, double current_speed);
-void PID_controller();
+// 初始化PID控制器
+void PID_init();
+// 创建一个控制任务
+void control_cmd(void *params);
