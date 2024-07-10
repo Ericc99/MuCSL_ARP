@@ -13,6 +13,9 @@ from .token import create_token, check_token, token_auth
 
 from .mqtt import client as mqtt_client
 
+import requests
+import base64
+
 
 @api_view(['GET', 'POST'])
 def task_list(request):
@@ -161,6 +164,36 @@ def mqtt_msg(request):
     if request.method == 'GET':
         motor_speed = MotorControl.objects.values().last()['motor_speed']
         return Response({'speed': motor_speed}, status=status.HTTP_200_OK)
+
+ 
+# Device List
+@api_view(['GET'])
+def device_list(request):
+    # 限制只接受一页，并且每页上限50个设备
+    url = "http://localhost:18083/api/v5/clients?page=1&limit=50&node=emqx%40127.0.0.1"
+    # EMQX 的密钥信息
+    api_key = "14d39e44d739b1d9"
+    secret_key = "DrXETy29CGKJnUHWMTQauKnOYzBN9A65z5Yw4FiUMpt9BC"
+
+    # 使用Base64方式加密密钥对
+    credentials = f"{api_key}:{secret_key}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic ' + encoded_credentials
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # 如果响应码不是200，会抛出异常
+
+        # 获取连接信息
+        connections = response.json()
+        return JsonResponse(connections, safe=False)
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 
 
 

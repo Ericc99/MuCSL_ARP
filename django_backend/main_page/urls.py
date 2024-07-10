@@ -13,7 +13,8 @@ urlpatterns = [
     re_path(r'^get_motors/$', views.get_motors),
     re_path(r'^test/$', views.test),
     re_path(r'^spinning/$', views.spinning),
-    re_path(r'^mqtt_msg/$', views.mqtt_msg)
+    re_path(r'^mqtt_msg/$', views.mqtt_msg),
+    re_path(r'^device_list/', views.device_list),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -5,7 +5,6 @@
 //          ^                                     |
 //          |                                     |
 //          ---------------------------------------
-
 double PID_Calculate(struct PID_params params, struct PID_data *data, double target_speed, double current_speed)
 {
     // 计算Error
@@ -53,7 +52,7 @@ double PID_Calculate(struct PID_params params, struct PID_data *data, double tar
 }
 
 // 初始化PID控制器
-void PID_init()
+void PID_init(void* params)
 {
     struct PID_data data = {
         .integral   = 0,
@@ -61,7 +60,7 @@ void PID_init()
         .pre_input = 0
     };
 
-    struct PID_params params = {
+    struct PID_params pid_params = {
         .Kp         = 8,
         .Ki         = 0.02,
         .Kd         = 0.01,
@@ -75,9 +74,9 @@ void PID_init()
         if(pcnt_updated == true)
         {
             double temp = motor_speed;
-            double new_input = PID_Calculate(params, &data, temp, pcnt_count);
+            double new_input = PID_Calculate(pid_params, &data, temp, pcnt_count);
             int new_input_int = 8192 - (int)new_input;
-            pwm_set_duty(new_input_int);
+            pwm_set_duty(new_input_int, 0);
             pcnt_updated = false;
         }
         else{
@@ -86,16 +85,28 @@ void PID_init()
     }
 }
 
+void pid_process_init()
+{
+    xTaskCreate(PID_init, "PID_TASK", 4096, NULL, 1, NULL);
+}
+
+
 // 创建一个控制任务
 void control_cmd(void *params)
 {
     cmd_params* local_params = (cmd_params*)params;
+    int local_speed = local_params -> speed;
+    int local_duration = local_params -> duration;
+
+
+
     char buff[64];
-    sprintf(buff, "Initial Speed: %d\nDuration: %d\nEnding Speed: %d\n", local_params->start_speed, local_params->duration, local_params->end_speed);
+    sprintf(buff, "Speed: %d\nDuration: %d", local_speed, local_duration);
     esp_mqtt_client_publish(mqtt_client, "cmd", buff, strlen(buff), 2, 0);
-    motor_speed = local_params -> start_speed;
-    vTaskDelay(local_params -> duration * 1000 / portTICK_PERIOD_MS);
-    motor_speed = local_params -> end_speed;
+    motor_speed = local_speed;
+    vTaskDelay(local_duration * 1000 / portTICK_PERIOD_MS);
+    motor_speed = 0;
+    pwm_set_duty(8192, 0);
     sprintf(buff, "Task Finished.");
     esp_mqtt_client_publish(mqtt_client, "task_manager", buff, strlen(buff), 2, 0);
     vTaskDelete(NULL);

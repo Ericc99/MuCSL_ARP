@@ -12,6 +12,9 @@ import os
 
 from django.apps import apps
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 
 
 def on_connect(mqtt_client, userdata, flags, rc):
@@ -25,16 +28,20 @@ def on_message(mqtt_client, userdata, msg):
     # print(f'Received message on topic: {msg.topic} with payload: {msg.payload}')
     topic = msg.topic
     payload = msg.payload.decode()
-    # print(f'Received message on topic: {topic} with payload: {payload}')
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        'mqtt_group',
+        {
+            'type': 'mqtt_msg_broadcast',
+            'message': payload
+        }
+    )
     if payload.startswith('PCNT count:'):
         count = int(payload[len('PCNT count: '):])
         motor_speed = int(count / 6)
         model = apps.get_model('main_page', 'MotorControl')
         model.objects.create(motor_speed=motor_speed, motor_name='Motor_1')
-        # serializer = MotorControlSerializer(data=data)
-        # if serializer.is_valid():
-        #     serializer.save()
-        #     print(data)
+    
 
 
 if os.environ.get('RUN_MAIN'):

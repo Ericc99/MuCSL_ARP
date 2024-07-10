@@ -33,6 +33,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'main_page',
     'rest_framework',
     'django.contrib.admin',
@@ -76,7 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_backend.wsgi.application'
 # ASGI 设置（Websocket路由方式）
-# ASGI_APPLICATION = "django_backend.asgi.application"
+ASGI_APPLICATION = "django_backend.asgi.application"
 
 
 # Database
@@ -145,3 +146,10 @@ MQTT_PORT = 1883
 MQTT_KEEPALIVE = 60
 MQTT_USER = 'Django'
 MQTT_PASSWORD = '123456'
+
+# Channels 相关配置
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
