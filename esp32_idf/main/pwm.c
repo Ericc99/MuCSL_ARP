@@ -17,7 +17,7 @@ void pwm_init()
     ESP_LOGI(TAG, "PWM timer %d initiated at clock speed %d.", LEDC_TIMER, LEDC_FREQ);
 
     // 初始化PWM通道
-    for(int i = 0; i < 6; i ++)
+    for(int i = 0; i < 4; i ++)
     {
         ledc_channel_config_t ledc_channel = {
             .speed_mode = LEDC_MODE,
@@ -39,10 +39,10 @@ void pwm_set_duty(int data, int channel)
     // PWM频率更新
     ledc_set_duty(LEDC_MODE, pwm_channels[channel], data);
     ledc_update_duty(LEDC_MODE, pwm_channels[channel]);
-    ESP_LOGI(TAG, "PWM duty set to %d.", data);
+    ESP_LOGI(TAG, "PWM channel %d duty set to %d.", channel, data);
 
     // MQTT通知
     char buff[64];
-    sprintf(buff, "PWM duty set to %d.", data);
-    esp_mqtt_client_publish(mqtt_client, "pid_feedback", buff, strlen(buff), 2, 0);
+    sprintf(buff, "pwm_set_%d", data);
+    esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
 }

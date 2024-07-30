@@ -1,5 +1,7 @@
 #include "main.h"
 
+static const char* TAG = "PID_EVENT";
+
 // 这里的PID控制针对于以下过程
 // -- 转速 --> PID 控制器 --> PWM 控制输入 --> PCNT 转速测量 -->
 //          ^                                     |
@@ -54,6 +56,12 @@ double PID_Calculate(struct PID_params params, struct PID_data *data, double tar
 // 初始化PID控制器
 void PID_init(void* params)
 {
+    // 获取外部参数
+    int index = *((int *) params);
+    ESP_LOGI(TAG, "Index number is: %d\n", index);
+    // 释放内存
+    free(params);
+
     struct PID_data data = {
         .integral   = 0,
         .pre_error  = 0,
@@ -71,13 +79,13 @@ void PID_init(void* params)
     };
 
     while(1){
-        if(pcnt_updated == true)
+        if(pcnt_updated_list[index] == true)
         {
-            double temp = motor_speed;
-            double new_input = PID_Calculate(pid_params, &data, temp, pcnt_count);
+            double temp = motor_speed_list[index];
+            double new_input = PID_Calculate(pid_params, &data, temp, pcnt_count_list[index]);
             int new_input_int = 8192 - (int)new_input;
-            pwm_set_duty(new_input_int, 0);
-            pcnt_updated = false;
+            pwm_set_duty(new_input_int, index);
+            pcnt_updated_list[index] = false;
         }
         else{
             vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -87,7 +95,22 @@ void PID_init(void* params)
 
 void pid_process_init()
 {
-    xTaskCreate(PID_init, "PID_TASK", 4096, NULL, 1, NULL);
+    for(int i = 0; i < 4; i++)
+    {
+        // 动态分配所需的内存空间
+        int *j = (int *)malloc(sizeof(int));
+        if(j != NULL)
+        {
+            *j = i;
+            // 创建线程
+            if(xTaskCreate(PID_init, "PID_TASK", 4096, (void*) j, 1, NULL) != pdPASS)
+            {
+                // 如果失败，释放内存
+                ESP_LOGI(TAG, "PID process %d creation failed.", *j);
+                free(j);
+            }
+        }
+    }
 }
 
 
@@ -97,18 +120,17 @@ void control_cmd(void *params)
     cmd_params* local_params = (cmd_params*)params;
     int local_speed = local_params -> speed;
     int local_duration = local_params -> duration;
-
-
+    int local_index = local_params -> index;
 
     char buff[64];
-    sprintf(buff, "Speed: %d\nDuration: %d", local_speed, local_duration);
-    esp_mqtt_client_publish(mqtt_client, "cmd", buff, strlen(buff), 2, 0);
-    motor_speed = local_speed;
+    sprintf(buff, "motor_number_%d_speed_%d_duration_%d",local_index, local_speed, local_duration);
+    esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
+    motor_speed_list[local_index] = local_speed;
     vTaskDelay(local_duration * 1000 / portTICK_PERIOD_MS);
-    motor_speed = 0;
-    pwm_set_duty(8192, 0);
-    sprintf(buff, "Task Finished.");
-    esp_mqtt_client_publish(mqtt_client, "task_manager", buff, strlen(buff), 2, 0);
+    motor_speed_list[local_index] = 0;
+    pwm_set_duty(8192, local_index);
+    sprintf(buff, "motor_number_%d_speed_%d_duration_%d_task_finished",local_index, local_speed, local_duration);
+    esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
     vTaskDelete(NULL);
 }
 

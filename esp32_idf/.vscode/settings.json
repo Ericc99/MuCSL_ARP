@@ -16,7 +16,13 @@
         "ledc.h": "c",
         "pcnt.h": "c",
         "esp_event.h": "c",
-        "pulse_cnt.h": "c"
+        "pulse_cnt.h": "c",
+        "*.tcc": "c",
+        "bitset": "c",
+        "fstream": "c",
+        "new": "c",
+        "numeric": "c",
+        "system_error": "c"
     },
     "cmake.configureOnOpen": true,
     "C_Cpp.errorSquiggles": "enabled"

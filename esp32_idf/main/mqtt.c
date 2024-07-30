@@ -1,32 +1,24 @@
 #include "main.h"
 
 static char* TAG = "ESP32S3_MQTT_EVENT";
-
 static bool connect_flag = false; // 定义一个连接上mqtt服务器的flag
 
 // MQTT信息处理
 void message_compare(char *msg)
 {
-    if(strncmp(msg, "pwm_", 4) == 0)
-    {
-        char tmp[5];
-        strcpy(tmp, msg + 4);
-        int new_duty = atoi(tmp);
-        motor_speed = new_duty;
-    }
-    else if(strncmp(msg, "cmd_", 4) == 0)
-    {
-        int speed, duration;
-        sscanf(msg, "cmd_%d_%d", &speed, &duration);
-        cmd_params params = {speed, duration};
-        xTaskCreate(control_cmd, "CMD_TASK", 4096, (void*)&params, 1, NULL);
-
-    }
-    else if(strcmp(msg, "Hello there") == 0)
+    if(strcmp(msg, "Hello there") == 0)
     {
         char buff[64];
         sprintf(buff, "Hello to you too");
-        esp_mqtt_client_publish(mqtt_client, "control", buff, strlen(buff), 2, 0);
+        esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
+    }
+    else if(strncmp(msg, "cmd_", 4) == 0)
+    {
+        int index, speed, duration;
+        sscanf(msg, "cmd_%d_%d_%d",  &index, &speed, &duration);
+        cmd_params params = {speed, duration, index};
+        xTaskCreate(control_cmd, "CMD_TASK", 4096, (void*)&params, 1, NULL);
+
     }
 }
 
@@ -43,8 +35,8 @@ static void mqtt_event_handler(void *args, esp_event_base_t base, int32_t id, vo
         case MQTT_EVENT_CONNECTED:
             ESP_LOGI(TAG, "Connected to MQTT server.");
             connect_flag = true;
-            // 订阅control来接收指令
-            esp_mqtt_client_subscribe(mqtt_client, "control", 2);
+            // 订阅MQTT 控制频道来接收指令
+            esp_mqtt_client_subscribe(mqtt_client, MQTT_CONTROL_CHANNEL, 2);
             break;
 
         case MQTT_EVENT_DISCONNECTED:
@@ -110,9 +102,9 @@ void mqtt_init()
         {
             char buff[64] = "ESP32_1 is online";
             // 向mqtt服务器发布主题为heartbeat，payload为buff的数据
-            esp_mqtt_client_publish(mqtt_client, "heartbeat", buff, strlen(buff), 2, 0); 
+            esp_mqtt_client_publish(mqtt_client, MQTT_HEARTBEAT_CHANNEL, buff, strlen(buff), 2, 0); 
         }
 
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
