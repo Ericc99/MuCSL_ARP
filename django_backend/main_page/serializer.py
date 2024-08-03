@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Task, MotorControl, User, LoginRecord, Motor, Spinning
+from .models import Task, MotorControl, User, LoginRecord, Motor, Spinning, MotorEvent, MotorData
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,4 +31,14 @@ class MotorSerializer(serializers.ModelSerializer):
 class SpinningSerializer(serializers.ModelSerializer):
     class Meta:
         model = Spinning
+        fields = '__all__'
+
+class MotorEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MotorEvent
+        fields = '__all__'
+
+class MotorDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MotorData
         fields = '__all__'

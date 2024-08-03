@@ -123,13 +123,13 @@ void control_cmd(void *params)
     int local_index = local_params -> index;
 
     char buff[64];
-    sprintf(buff, "motor_number_%d_speed_%d_duration_%d",local_index, local_speed, local_duration);
+    sprintf(buff, "task_create_%d_%d_%d",local_index, local_speed, local_duration);
     esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
     motor_speed_list[local_index] = local_speed;
     vTaskDelay(local_duration * 1000 / portTICK_PERIOD_MS);
     motor_speed_list[local_index] = 0;
     pwm_set_duty(8192, local_index);
-    sprintf(buff, "motor_number_%d_speed_%d_duration_%d_task_finished",local_index, local_speed, local_duration);
+    sprintf(buff, "task_finished_%d_%d_%d",local_index, local_speed, local_duration);
     esp_mqtt_client_publish(mqtt_client, MQTT_CONTROL_CHANNEL, buff, strlen(buff), 2, 0);
     vTaskDelete(NULL);
 }

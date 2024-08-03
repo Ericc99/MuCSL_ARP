@@ -1,2 +1,1 @@
-from . import mqtt
-mqtt.client.loop_start()
+default_app_config = 'main_page.apps.MyAppConfig'

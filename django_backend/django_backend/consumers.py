@@ -14,8 +14,5 @@ class MyConsumer(AsyncWebsocketConsumer):
         await self.send(text_data)
 
     async def mqtt_msg_broadcast(self, event):
-        msg = event['message']
-        await self.send(text_data=json.dumps({
-            'message': msg
-        }))
+        await self.send(text_data=json.dumps(event))
 

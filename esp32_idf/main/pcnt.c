@@ -49,7 +49,7 @@ void pcnt_monitor(void* params)
         {
             // 如果空闲，发送PCNT转速信息并停止
             char buff[64];
-            sprintf(buff, "pcnt_count_%d", pcnt_count_list[index]);
+            sprintf(buff, "pcnt_count_%d_%d", index, pcnt_count_list[index]);
             esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
             pwm_set_duty(8192, index);
             pcnt_updated_list[index] = false;
@@ -61,7 +61,7 @@ void pcnt_monitor(void* params)
         {
             // 如果不空闲则开始测量
             char buff[64];
-            sprintf(buff, "pcnt_count_%d", pcnt_count_list[index]);
+            sprintf(buff, "pcnt_count_%d_%d", index, pcnt_count_list[index]);
             esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
             idle = false;
             pcnt_updated_list[index] = true;

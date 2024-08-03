@@ -43,6 +43,6 @@ void pwm_set_duty(int data, int channel)
 
     // MQTT通知
     char buff[64];
-    sprintf(buff, "pwm_set_%d", data);
+    sprintf(buff, "pwm_set_%d_%d", channel, data);
     esp_mqtt_client_publish(mqtt_client, MQTT_DATA_CHANNEL, buff, strlen(buff), 2, 0);
 }
