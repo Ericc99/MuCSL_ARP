@@ -1,4 +1,8 @@
 import serial, time, threading
+import paho.mqtt.client as mqtt
+import motor_driver_config as config
+
+global running
 
 cmd_list = {
     'set_res_3600': '01 06 00 23 0E 10',
@@ -55,11 +59,12 @@ class motor_control:
         self.position = 0
         self.position_data = False
         self.busy = False
+        self.client = None
     
     def init(self):
         # 初始化串口连接
         try:
-            self.serial = serial.Serial(self.port, self.baudrate, timeout=1)
+            self.serial = serial.Serial(self.port, self.baudrate, timeout=0.01)
             print(f'Connected to {self.port} at {self.baudrate} baud')
             
         except serial.SerialException as e:
@@ -68,6 +73,32 @@ class motor_control:
         # 初始化读写线程
         self.read_thread = threading.Thread(target=self.read_data)
         self.read_thread.start()
+
+        # 初始化MQTT
+        self.client = mqtt.Client()
+        self.client.on_connect = self.mqtt_on_connect
+        self.client.on_message = self.mqtt_on_message
+        self.client.username_pw_set(config.MQTT_USER, config.MQTT_PASSWORD)
+        self.client.connect(
+            host = config.MQTT_SERVER,
+            port = config.MQTT_PORT,
+            keepalive = config.MQTT_KEEPALIVE
+        )
+        self.client.loop_start()
+
+    def mqtt_on_connect(self, mqtt_client, userdata, flags, rc):
+        if rc == 0:
+            print("MQTT Connect Success!")
+            mqtt_client.subscribe('spintable_1/+')
+        else:
+            print("Bad Connection Code: ", rc)
+
+    def mqtt_on_message(self, mqtt_client, userdata, msg):
+        topic = msg.topic
+        payload = msg.payload.decode()
+        if topic == 'spintable_1/control':
+            self.command(payload)
+        print(f'Received data from {topic}: {payload}')
 
     def command(self, cmd):
         if cmd == 'quit':
@@ -109,13 +140,15 @@ class motor_control:
 
     def stop(self):
         self.running = False
-        self.read_thread.join()
-        self.close()
-    
-    def close(self):
+        if self.client:
+            self.client.loop_stop()
+            self.client.disconnect()
+        if self.read_thread:
+            self.read_thread.join()
         if self.serial.is_open:
             self.serial.close()
             print(f'Disconnected form {self.serial}')
+        
     
     def cmd_gen(self, sequence):
         parts = sequence.split(' ')
@@ -156,10 +189,12 @@ class motor_control:
     
     def back_to_zero(self):
         cmds = [cmd_list['get_pos']]
-        self.send_data(cmds)
-        # 告知Read线程读取
+        # 告知Read线程准备读取
         self.position_data = True
-        time.sleep(2)
+        # 发送信号请求位置信息
+        self.send_data(cmds)
+        # 确保位置信息已经获取
+        time.sleep(0.02)
         # 获得当前position
         remaining_int = 3600 - (self.position % 3600)
         remaining_hex = hex(remaining_int)[2:].upper().zfill(4)
@@ -175,10 +210,10 @@ class motor_control:
 
     def get_loc(self):
         cmds = [cmd_list['get_pos']]
-        self.send_data(cmds)
-        # 告知Read线程读取
+        # 告知Read线程准备读取
         self.position_data = True
-        time.sleep(2)
+        # 发送指令通知测量数据
+        self.send_data(cmds)
     
     def clear_loc(self):
         cmds = [cmd_list['clear_pos']]
@@ -200,30 +235,34 @@ class motor_control:
             self.serial.write(bytes.fromhex(send))
             time.sleep(0.01)
     
+    def control_loop(self):
+        try:
+            print('''
+                    Welcome to motor control system.\n
+                -----------------------------------------------------------------
+                    1. init: Init the system again.
+                    2. rotate_360: rotate a round (clockwise).
+                    3. rotate_30: rotate 30 degrees (clockwise).
+                    4. zero: return to origin.
+                    5. r_X: rotate X degrees (clockwise).
+                    6. get_loc: get current location.
+                    7. clear_loc: clear all positional parameters
+                    8. lock: lock the motor.
+                    9. unlock: unlock the motor.
+                    Note: plase lock the motor before you proceed to next command.
+                -----------------------------------------------------------------\n''')
+            
+            while True:
+                msg = input('>>')
+                m.command(msg)
+                if msg == 'quit':
+                    break
+        except KeyboardInterrupt:
+            m.command('quit')
+    
 
 if __name__ == '__main__':
     m = motor_control()
     m.init()
     m.init_motor()
-    try:
-        print('''
-                Welcome to motor control system.\n
-              -----------------------------------------------------------------
-                1. init: Init the system again.
-                2. rotate_360: rotate a round (clockwise).
-                3. rotate_30: rotate 30 degrees (clockwise).
-                4. zero: return to origin.
-                5. r_X: rotate X degrees (clockwise).
-                6. get_loc: get current location.
-                7. clear_loc: clear all positional parameters
-                8. lock: lock the motor.
-                9. unlock: unlock the motor.
-                Note: plase lock the motor before you proceed to next command.
-              -----------------------------------------------------------------\n''')
-        while True:
-            msg = input('Enter your command: \n')
-            m.command(msg)
-            if msg == 'quit':
-                break
-    except KeyboardInterrupt:
-        m.command('quit')
+    m.control_loop()
