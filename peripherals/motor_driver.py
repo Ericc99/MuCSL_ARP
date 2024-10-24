@@ -250,6 +250,7 @@ class motor_control:
                     8. lock: lock the motor.
                     9. unlock: unlock the motor.
                     Note: plase lock the motor before you proceed to next command.
+                    MQTT Channel: spintable_1/control
                 -----------------------------------------------------------------\n''')
             
             while True:

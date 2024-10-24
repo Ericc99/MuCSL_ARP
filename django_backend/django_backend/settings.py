@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*',]
 
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = ('*')
 
 
 # Application definition
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'channels',
+    'drf_yasg', # 自动生成API
 ]
 
 MIDDLEWARE = [

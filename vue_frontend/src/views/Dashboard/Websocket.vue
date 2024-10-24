@@ -28,6 +28,14 @@
         </div>
 
     </div>
+    <h1 class="title">
+        RoboArm Control Pannel
+    </h1>
+
+    <div>
+        <iframe width="424" height="240" src="https://www.youtube.com/embed/tP0jF6KEP4o" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    
 </template>
 <script>
 
