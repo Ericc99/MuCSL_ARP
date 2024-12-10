@@ -1,0 +1,15 @@
+# Vue Frontend
+vue_frontend/node_modules
+
+# peripherals
+peripherals/__pycache__
+
+# esp32_idf
+esp32_idf/build
+esp32_idf/sdkconfig
+esp32_idf/sdkconfig.old
+esp32_idf/sdkconfig.ci
+
+# django_backend
+django_backend/django_backend/__pycache__
+django_backend/main_page/__pycache__
