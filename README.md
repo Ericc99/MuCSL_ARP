@@ -11,5 +11,5 @@ The platform is consisted of three major, some minor components and other periph
 - Django Backend
 - Vue Frontend
 - ESP32 IDF Clients
-
 - EMQX MQTT Message Server
+- Control program for other peripheral components, including RoboArm and Motor for Spin-table
