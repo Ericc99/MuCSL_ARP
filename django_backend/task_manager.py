@@ -2,16 +2,17 @@ import sqlite3, time, threading
 from datetime import datetime, timedelta
 from paho.mqtt import client as mqtt
 
-
 task_finished = False
+
 
 # MQTT 相关组件
 def mqtt_on_connect(mqtt_client, userdata, flags, rc):
-        if rc == 0:
-            print("MQTT Connect Success!")
-            mqtt_client.subscribe('task_manager')
-        else:
-            print("Bad Connection Code: ", rc)
+    if rc == 0:
+        print("MQTT Connect Success!")
+        mqtt_client.subscribe('task_manager')
+    else:
+        print("Bad Connection Code: ", rc)
+
 
 def mqtt_on_message(mqtt_client, userdata, msg):
     topic = msg.topic
@@ -21,6 +22,7 @@ def mqtt_on_message(mqtt_client, userdata, msg):
         global task_finished
         task_finished = True
 
+
 class Task_Manager():
     def __init__(self):
         self.conn = None
@@ -29,7 +31,7 @@ class Task_Manager():
         self.terminate = False
         self.task_triggered = False
         self.mqtt_client = None
-    
+
     # 整体控制初始化
     def manager_init(self):
         self.mqtt_init()
@@ -37,7 +39,6 @@ class Task_Manager():
         threading.Thread(target=self.timer_thread).start()
         threading.Thread(target=self.mqtt_heartbeat).start()
         self.user_input()
-
 
     # 数据库相关组件
     def database_connect(self):
@@ -57,7 +58,8 @@ class Task_Manager():
             for row in results:
                 if local_first_task == None:
                     local_first_task = row
-                elif datetime.strptime(local_first_task[2], '%Y-%m-%d %H:%M:%S') > datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S'):
+                elif datetime.strptime(local_first_task[2], '%Y-%m-%d %H:%M:%S') > datetime.strptime(row[2],
+                                                                                                     '%Y-%m-%d %H:%M:%S'):
                     local_first_task = row
             # 将UTC转化成UTC+8
             UTC = datetime.strptime(local_first_task[2], '%Y-%m-%d %H:%M:%S')
@@ -72,22 +74,22 @@ class Task_Manager():
             if self.first_task == None:
                 self.first_task = local_first_task
                 self.task_triggered = False
-                record_update = 'Updated First Task Detial: \n'+str(self.first_task)
+                record_update = 'Updated First Task Detial: \n' + str(self.first_task)
                 print(record_update)
                 self.mqtt_client.publish('task_manager', record_update)
             else:
                 if datetime.strptime(self.first_task[2], '%Y-%m-%d %H:%M:%S') != UTC_8:
                     self.first_task = local_first_task
                     self.task_triggered = False
-                    record_update = 'Updated First Task Detial: \n'+str(self.first_task)
+                    record_update = 'Updated First Task Detial: \n' + str(self.first_task)
                     print(record_update)
-                    self.mqtt_client.publish('task_manager', record_update) 
+                    self.mqtt_client.publish('task_manager', record_update)
         else:
             self.first_task = None
-        
+
     # 更新数据线程
     def update_thread(self):
-        
+
         while not self.terminate:
             self.database_connect()
             # 监测任务是否完成
@@ -108,8 +110,10 @@ class Task_Manager():
             if self.first_task == None:
                 pass
             else:
-                if (datetime.now() > datetime.strptime(self.first_task[2], '%Y-%m-%d %H:%M:%S')) and not self.task_triggered:
-                    timer_trigger = 'Timer at ' + str(self.first_task[2]) + ' has be triggered. Current time is ' + str(datetime.now())
+                if (datetime.now() > datetime.strptime(self.first_task[2],
+                                                       '%Y-%m-%d %H:%M:%S')) and not self.task_triggered:
+                    timer_trigger = 'Timer at ' + str(self.first_task[2]) + ' has be triggered. Current time is ' + str(
+                        datetime.now())
                     print(timer_trigger)
                     self.mqtt_client.publish('task_manager', timer_trigger)
                     self.task_triggered = True
@@ -134,7 +138,7 @@ class Task_Manager():
         while not self.terminate:
             self.mqtt_client.publish('heartbeat/task_manager', 'Status: Alive')
         self.mqtt_client.loop_stop()
-    
+
     # 用户操作界面
     def user_input(self):
         while not self.terminate:
@@ -143,6 +147,7 @@ class Task_Manager():
                 self.terminate = True
             elif usr_in == 'get_first_task':
                 print(self.first_task)
+
 
 if __name__ == '__main__':
     tm = Task_Manager()

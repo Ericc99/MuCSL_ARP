@@ -3,7 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Task, MotorControl, User, Motor, Spinning
-from .serializer import TaskSerializer, MotorControlSerializer, UserSerializer, LoginRecordSerializer, SpinningSerializer
+from .serializer import TaskSerializer, MotorControlSerializer, UserSerializer, LoginRecordSerializer, \
+    SpinningSerializer
 from django.contrib.auth.hashers import make_password, check_password
 from django.http import JsonResponse
 from datetime import datetime
@@ -24,6 +25,7 @@ def task_list(request):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
+
 @api_view(['GET', 'POST'])
 def motor_control_list(request):
     if request.method == 'POST':
@@ -36,7 +38,8 @@ def motor_control_list(request):
         controls = MotorControl.objects.all()
         serializer = MotorControlSerializer(controls, many=True)
         return Response(serializer.data)
-    
+
+
 @api_view(['POST'])
 def login(request):
     user = User.objects.filter(email=request.data['email'])
@@ -49,11 +52,12 @@ def login(request):
                 login_record_s.save()
             else:
                 print(login_record_s.errors)
-            return Response({'Login Success':'Login Success', 'token': token}, status=status.HTTP_200_OK)
-        else: 
-            return Response({'Login Failed':'Wrong Password!'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'Login Success': 'Login Success', 'token': token}, status=status.HTTP_200_OK)
+        else:
+            return Response({'Login Failed': 'Wrong Password!'}, status=status.HTTP_401_UNAUTHORIZED)
     else:
-        return Response({'Login Failed':'User Does Not Exist!'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'Login Failed': 'User Does Not Exist!'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 @api_view(['POST'])
 def sign_up(request):
@@ -62,11 +66,12 @@ def sign_up(request):
     data['password'] = make_password(data['password'])
     serializer = UserSerializer(data=data)
     if User.objects.filter(email=data['email']).exists():
-        return Response({'Registration Failed':'User Already Exists!'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Registration Failed': 'User Already Exists!'}, status=status.HTTP_400_BAD_REQUEST)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def token_validation(request):
@@ -78,15 +83,17 @@ def token_validation(request):
     else:
         return Response({'Token validation': 'Success', 'email': result['email']}, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 def get_user_data(request):
-    if(request.data['token']):
+    if (request.data['token']):
         if token_auth(request.data['token']):
             data = User.objects.filter(email=request.data['email']).values()[0]
             del data['password']
             del data['id']
             return JsonResponse(data=data, status=status.HTTP_200_OK)
-        
+
+
 @api_view(['POST'])
 def change_password(request):
     if token_auth(request.data['token']):
@@ -101,6 +108,7 @@ def change_password(request):
             else:
                 return Response({'Password change fail': 'Old password wrong'}, status=status.HTTP_401_UNAUTHORIZED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def get_motors(request):
@@ -119,7 +127,8 @@ def spinning(request):
             spin_instance = request.data['data']
             print(spin_instance)
             if spin_instance['motor_name']:
-                spin_instance['scheduled_time'] = datetime.strptime(spin_instance['scheduled_time'], '%Y-%m-%dT%H:%M:%S')
+                spin_instance['scheduled_time'] = datetime.strptime(spin_instance['scheduled_time'],
+                                                                    '%Y-%m-%dT%H:%M:%S')
                 # print(spin_instance)
                 spin_ser = SpinningSerializer(data=spin_instance)
                 if spin_ser.is_valid():
@@ -133,7 +142,7 @@ def spinning(request):
                 record['scheduled_time'] = timezone.localtime(record['scheduled_time'])
                 # print(record)
             return Response({'record_list': records}, status.HTTP_200_OK)
-        
+
 
 @api_view(['GET', 'POST'])
 def test(request):
@@ -146,13 +155,14 @@ def test(request):
             'duration': record['duration_sec']
         }
         records.append(temp)
-    return Response({'now': timezone.localtime().timestamp(),'data': records}, status=status.HTTP_200_OK)
+    return Response({'now': timezone.localtime().timestamp(), 'data': records}, status=status.HTTP_200_OK)
+
 
 # MQTT View
 @api_view(['GET', 'POST'])
 def mqtt_msg(request):
     if request.method == 'POST':
-        if(request.data['topic']):
+        if (request.data['topic']):
             topic = request.data['topic']
             msg = request.data['msg'] * 6
             msg = 'pwm_' + str(msg)
@@ -165,7 +175,7 @@ def mqtt_msg(request):
         motor_speed = MotorControl.objects.values().last()['motor_speed']
         return Response({'speed': motor_speed}, status=status.HTTP_200_OK)
 
- 
+
 # Device List
 @api_view(['GET'])
 def device_list(request):
@@ -193,10 +203,3 @@ def device_list(request):
         return JsonResponse(connections, safe=False)
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
-
-
-
-
-
-
-

@@ -1,5 +1,8 @@
-import serial, time, threading
 import paho.mqtt.client as mqtt
+import serial
+import threading
+import time
+
 import motor_driver_config as config
 
 global running
@@ -17,6 +20,7 @@ cmd_list = {
     'clear_pos': '01 06 00 4F 04 00',
 }
 
+
 def crc16_modbus(data: str) -> str:
     """
     计算给定十六进制字符串的CRC16 Modbus校验位。
@@ -29,7 +33,7 @@ def crc16_modbus(data: str) -> str:
     """
     # CRC16 Modbus参数
     POLY = 0xA001  # 多项式
-    crc = 0xFFFF   # 初始值
+    crc = 0xFFFF  # 初始值
 
     # 将输入的十六进制字符串转换为字节数组
     bytes_data = bytes.fromhex(data)
@@ -40,14 +44,15 @@ def crc16_modbus(data: str) -> str:
         # 遍历每一个位
         for _ in range(8):
             if (crc & 0x0001):  # 检查最低位是否为1
-                crc >>= 1       # 右移1位
-                crc ^= POLY     # 与多项式进行异或
+                crc >>= 1  # 右移1位
+                crc ^= POLY  # 与多项式进行异或
             else:
-                crc >>= 1       # 右移1位
+                crc >>= 1  # 右移1位
 
     # 将CRC值转换为十六进制字符串，保持长度为4字符（2字节），并大写
     crc_hex = f"{crc:04X}"
     return crc_hex
+
 
 class motor_control:
     def __init__(self):
@@ -60,16 +65,16 @@ class motor_control:
         self.position_data = False
         self.busy = False
         self.client = None
-    
+
     def init(self):
         # 初始化串口连接
         try:
             self.serial = serial.Serial(self.port, self.baudrate, timeout=0.01)
             print(f'Connected to {self.port} at {self.baudrate} baud')
-            
+
         except serial.SerialException as e:
             print(f'Error: {e}')
-        
+
         # 初始化读写线程
         self.read_thread = threading.Thread(target=self.read_data)
         self.read_thread.start()
@@ -80,9 +85,9 @@ class motor_control:
         self.client.on_message = self.mqtt_on_message
         self.client.username_pw_set(config.MQTT_USER, config.MQTT_PASSWORD)
         self.client.connect(
-            host = config.MQTT_SERVER,
-            port = config.MQTT_PORT,
-            keepalive = config.MQTT_KEEPALIVE
+            host=config.MQTT_SERVER,
+            port=config.MQTT_PORT,
+            keepalive=config.MQTT_KEEPALIVE
         )
         self.client.loop_start()
 
@@ -115,7 +120,7 @@ class motor_control:
             self.back_to_zero()
         elif cmd.startswith('r_'):
             angle = int(cmd[2:])
-            self.rotate_angle(angle*10)
+            self.rotate_angle(angle * 10)
         elif cmd == 'get_loc':
             self.get_loc()
         elif cmd == 'clear_loc':
@@ -148,8 +153,7 @@ class motor_control:
         if self.serial.is_open:
             self.serial.close()
             print(f'Disconnected form {self.serial}')
-        
-    
+
     def cmd_gen(self, sequence):
         parts = sequence.split(' ')
         cmd = ''
@@ -159,21 +163,21 @@ class motor_control:
         # 将其接到原指令末尾
         crced_cmd = cmd + crc[2:4]
         crced_cmd += crc[0:2]
-        final_cmd = ' '.join(crced_cmd[i:i+2] for i in range(0, len(crced_cmd), 2))
+        final_cmd = ' '.join(crced_cmd[i:i + 2] for i in range(0, len(crced_cmd), 2))
         return final_cmd
-    
+
     def init_motor(self):
-        cmds = [cmd_list['set_res_3600'], 
-               cmd_list['write_current'],
-               cmd_list['read_current'],
-               cmd_list['clear_pos']]
+        cmds = [cmd_list['set_res_3600'],
+                cmd_list['write_current'],
+                cmd_list['read_current'],
+                cmd_list['clear_pos']]
         self.send_data(cmds)
-    
+
     def rotate_360(self):
         cmds = [cmd_list['rotate_3600'],
                 cmd_list['start_rotate']]
         self.send_data(cmds)
-    
+
     def rotate_30(self):
         cmds = [cmd_list['rotate_300'],
                 cmd_list['start_rotate']]
@@ -186,7 +190,6 @@ class motor_control:
                 cmd_list['start_rotate']]
         self.send_data(cmds)
 
-    
     def back_to_zero(self):
         cmds = [cmd_list['get_pos']]
         # 告知Read线程准备读取
@@ -214,7 +217,7 @@ class motor_control:
         self.position_data = True
         # 发送指令通知测量数据
         self.send_data(cmds)
-    
+
     def clear_loc(self):
         cmds = [cmd_list['clear_pos']]
         self.send_data(cmds)
@@ -222,19 +225,18 @@ class motor_control:
     def unlock(self):
         cmds = [cmd_list['unlock']]
         self.send_data(cmds)
-    
+
     def lock(self):
         cmds = [cmd_list['lock']]
         self.send_data(cmds)
-        
-    
+
     def send_data(self, cmds):
         for cmd in cmds:
             send = self.cmd_gen(cmd)
             print(bytes.fromhex(send))
             self.serial.write(bytes.fromhex(send))
             time.sleep(0.01)
-    
+
     def control_loop(self):
         try:
             print('''
@@ -252,7 +254,7 @@ class motor_control:
                     Note: plase lock the motor before you proceed to next command.
                     MQTT Channel: spintable_1/control
                 -----------------------------------------------------------------\n''')
-            
+
             while True:
                 msg = input('>>')
                 m.command(msg)
@@ -260,7 +262,7 @@ class motor_control:
                     break
         except KeyboardInterrupt:
             m.command('quit')
-    
+
 
 if __name__ == '__main__':
     m = motor_control()

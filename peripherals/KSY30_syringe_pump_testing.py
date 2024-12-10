@@ -10,6 +10,7 @@ DT_cmd_test_list = {
     "Inlet_to_outlet": 'IA24000M10000A0M1000R',
     "Three_loops_test": 'IA24000M10000A0M1000G3R',
     "Split_drainage": 'IA24000M10000A12000M1000A0R',
+    "Current_location": "2f313f340d"
 }
 
 
@@ -33,8 +34,22 @@ def init():
 
         # 查看串口是否返回正确启动信息
         resp = ser.readline()
-        if str(resp.hex()) == "2f306767030d0a":
+        if str(resp.hex()) == "2f306767030d0a" or "2f306060030d0a":
             print("Available")
+            time.sleep(1)
+            ser.write(bytes.fromhex(DT_cmd_test_list["Current_location"]))
+            print(ser.readline())
+            if str(ser.readline()) == "2f30603234303030030d0a":
+                ser.write(DT_cmd_to_byte(DT_cmd_test_list["Init"]))
+                time.sleep(8)
+                ser.write(DT_cmd_to_byte(DT_cmd_test_list["In_2.5ml"]))
+                time.sleep(8)
+                ser.write(DT_cmd_to_byte(DT_cmd_test_list["Init"]))
+            else:
+                ser.write(DT_cmd_to_byte(DT_cmd_test_list["In_2.5ml"]))
+                time.sleep(8)
+                ser.write(DT_cmd_to_byte(DT_cmd_test_list["Init"]))
+                time.sleep(8)
         else:
             print(resp.hex())
             return False
@@ -42,17 +57,15 @@ def init():
         print(f"Error: {error}")
 
     # 阀门校准加预备三联
-    ser.write(DT_cmd_to_byte(DT_cmd_test_list["Init"]))
-    time.sleep(8)
-    ser.write(DT_cmd_to_byte(DT_cmd_test_list["In_2.5ml"]))
-    time.sleep(8)
-    ser.write(DT_cmd_to_byte(DT_cmd_test_list["Init"]))
 
     return True
 
 
 def Volumetric_Converter(vol):
     # 用于将加液计量换算成步进电机步数
+    vol = config.REGRESSION_COEFFICIENT * vol + config.INTERCEPT
+    vol = round(vol, 4)
+    print(vol)
     unit_vol = config.FULL_STEPS / config.CHAMBER_VOL
     # 等待1s=1000ms
     wait = 1000
@@ -77,7 +90,7 @@ def Volumetric_Converter(vol):
                 cmd = "IA" + str(config.FULL_STEPS) + "M" + str(wait) + "OAO" + loops + "M1000" + "R"
         else:
             cmd = "IA" + str(int(vol * unit_vol)) + "M" + str(wait) + "OAO" + "R"
-    # print(cmd)
+    print(cmd)
     return cmd
 
 
@@ -94,7 +107,12 @@ def injection(vol):
 
 
 if __name__ == '__main__':
-    if init():
-        injection(2.5)  # 加2.5ml
-    else:
-        print("error")
+    injection(6)
+
+# round 4 1.25ml->1.2475g [1.257, 1.255, 1.257, 1.254, 1.256]
+
+# 1.25ml->1.2475g [1.255, 1.255, 1.254, 1.256, 1.255] / 0.52% ~ 0.68%
+
+# 3.00ml->2.994g [3.022, 3.018, 3.020, 3.018, 3.018] / 0.80% ~ 0.94%
+
+# 6.00ml->5.988g [6.048, 6.045, 6.048, 6.031, 6.043] / 0.72% ~ 1.00%

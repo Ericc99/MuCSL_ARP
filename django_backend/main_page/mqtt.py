@@ -19,6 +19,7 @@ from .models import MotorEvent, MotorData
 
 ongoing_events = []
 
+
 def on_connect(mqtt_client, userdata, flags, rc):
     if rc == 0:
         print("MQTT Connect Success!")
@@ -26,18 +27,20 @@ def on_connect(mqtt_client, userdata, flags, rc):
     else:
         print("Bad Connection Code: ", rc)
 
+
 # Django 存储方法
 # Device事件开始
 def device_event_start(device_id, motor, speed, time):
     global ongoing_events
     # objects.create()方法返回一个新建立的object
     device_event = MotorEvent.objects.create(
-        device_id = device_id,
-        motor = motor,
-        speed = speed,
-        time = time,
+        device_id=device_id,
+        motor=motor,
+        speed=speed,
+        time=time,
     )
     ongoing_events.append(device_event)
+
 
 # Motor接收数据
 def device_data(device_id, motor, data_type, data):
@@ -46,13 +49,14 @@ def device_data(device_id, motor, data_type, data):
         # 判定当前接收数据与正在进行事件列表中哪一个事件契合
         if event.motor == motor and event.device_id == device_id:
             MotorData.objects.create(
-                parent_event_id = event,
-                motor_id = motor,
-                data_type = data_type,
-                data = data
+                parent_event_id=event,
+                motor_id=motor,
+                data_type=data_type,
+                data=data
             )
         else:
             pass
+
 
 # Device事件结束
 def device_event_done(device_id, motor):
@@ -68,7 +72,6 @@ def device_event_done(device_id, motor):
             tmp_array.append(event)
     # 更新仍在进行的事件列表
     ongoing_events = tmp_array
-        
 
 
 def on_message(mqtt_client, userdata, msg):
@@ -94,7 +97,7 @@ def on_message(mqtt_client, userdata, msg):
             }
             # 将收到的异步信息以同步的形式发送到Websocket接收端（consumer.py）
             async_to_sync(channel_layer.group_send)('mqtt_group', package)
-        
+
         # ESP32反馈PCNT数据
         # pcnt_count_motor_data
         elif payload.startswith('pcnt_count_'):
@@ -167,7 +170,6 @@ def on_message(mqtt_client, userdata, msg):
                 }
                 device_event_done(1, motor)
                 async_to_sync(channel_layer.group_send)('mqtt_group', package)
-    
 
 
 if os.environ.get('RUN_MAIN'):
