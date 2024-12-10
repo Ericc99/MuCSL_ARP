@@ -3,6 +3,7 @@ vue_frontend/node_modules
 
 # peripherals
 peripherals/__pycache__
+peripherals/*/__pycache__
 
 # esp32_idf
 esp32_idf/build
