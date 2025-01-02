@@ -13,3 +13,13 @@ The platform is consisted of three major, some minor components and other periph
 - ESP32 IDF Clients
 - EMQX MQTT Message Server
 - Control program for other peripheral components, including RoboArm and Motor for Spin-table
+
+## Future Plans
+
+<u>2025-01-03</u>
+Happy new year.
+
+The platform will soon be transfered to ROS2 environment, as it can provide strong support for such robotic projects. 
+
+The transition will not be quite smooth but I surly hope it can be done before Mid January 2025.
+
